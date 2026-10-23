@@ -69,15 +69,34 @@ public class EmployeeController {
         return "redirect:/employeelist";
     }
 
+    // @GetMapping("/employeelist")
+    // public String getEmployeeList(Model model) {
+    //     model.addAttribute("employees", empService.getAllEmployees());
+    //     model.addAttribute("pageTitle", "EmployeeList");
+    //     model.addAttribute("content", "user/employeeList");
+    //     return "layout";
+    // }
+
     @GetMapping("/employeelist")
-    public String getEmployeeList(Model model) {
-        model.addAttribute("employees", empService.getAllEmployees());
+    public String getEmployeeList(@RequestParam(required = false) String name,
+                                @RequestParam(required = false) Integer departmentId,
+                                @RequestParam(defaultValue = "0") int page,
+                                @RequestParam(defaultValue = "10") int size,
+                                Model model) {
+        Page<Employee> result = empService.searchEmployees(name, departmentId, page, size);
+
+        model.addAttribute("employees", result.getContent());
+        model.addAttribute("currentPage", result.getNumber());
+        model.addAttribute("totalPages", result.getTotalPages());
+        model.addAttribute("totalItems", result.getTotalElements());
+        model.addAttribute("name", name);
+        model.addAttribute("departmentId", departmentId);
+        model.addAttribute("size", result.getSize());
+        model.addAttribute("departments", departmentService.getAllDepartments());
         model.addAttribute("pageTitle", "EmployeeList");
         model.addAttribute("content", "user/employeeList");
         return "layout";
     }
-
-    
 
     @GetMapping("/employee/edit/{id}")
     public String getEmployee(@PathVariable Integer id,@ModelAttribute Employee employee, Model model) {
