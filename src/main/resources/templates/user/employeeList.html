@@ -1,0 +1,85 @@
+<div th:fragment="content" xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.w3.org/1999/xhtml">
+    <div class="container py-5">
+
+    <!-- Success alert -->
+    <div th:if="${msg}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${msg}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- Title + Add button -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="page-title">Employee Directory</h2>
+        <a sec:authorize="hasRole('ADMIN')" th:href="@{/register}" class="btn btn-primary px-4">+ Add Employee</a>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrapper shadow-lg p-3">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover text-center align-middle">
+                <thead>
+                <tr>
+                    <th>SL No</th>
+                    <th>Employee</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Hire Date</th>
+                    <th>Gender</th>
+                    <th>Department</th>
+                    <th>Role</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="employee, i : ${employees}">
+                    <td th:text="${i.index + 1}"></td>
+                    <td th:text="${employee.firstName + ' ' + employee.lastName}"></td>
+                    <td th:text="${employee.email}"></td>
+
+                    <td th:text="${employee.phones != null && employee.phones.?[isPrimary == true].size() > 0
+                                    ? employee.phones.?[isPrimary == true][0].phoneNumber
+                                    : 'N/A'}"></td>
+
+                    <td th:text="${employee.hireDate}"></td>
+                    <td th:text="${employee.gender}"></td>
+                    <td th:text="${employee.department != null ? employee.department.name : 'N/A'}"></td>
+                    <td th:text="${employee.role.title}"></td>
+
+                    <td class="action-buttons">
+                        <!-- ADMIN / HR → can edit anyone -->
+                        <a
+                                sec:authorize="hasAnyRole('ADMIN','HR')"
+                                th:href="@{/employee/edit/{id}(id=${employee.id})}"
+                                class="btn btn-warning btn-sm">
+                            Edit
+                        </a>
+
+                        <!-- NORMAL USER → can edit only own record -->
+                        <a
+                                sec:authorize="!hasAnyRole('ADMIN','HR')"
+                                th:if="${#authentication.name == employee.email}"
+                                th:href="@{/employee/edit/{id}(id=${employee.id})}"
+                                class="btn btn-warning btn-sm">
+                            Edit
+                        </a>
+                        <a sec:authorize="hasAnyRole('ADMIN','HR')"
+                           th:href="@{/employee/delete/{id}(id=${employee.id})}"
+                           class="btn btn-danger btn-sm"
+                           onclick="return confirm('Delete employee?')">
+                            Delete
+                        </a>
+
+                    </td>
+                </tr>
+
+                <!-- Empty message -->
+                <tr th:if="${#lists.isEmpty(employees)}">
+                    <td colspan="9" class="text-danger fw-bold">No Employees Found</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</div>

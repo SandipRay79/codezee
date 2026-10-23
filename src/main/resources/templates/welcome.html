@@ -1,0 +1,18 @@
+<div th:fragment="content">
+    <!-- Failure alert -->
+    <div th:if="${errorMsg}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${errorMsg}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div class="container mt-5">
+        <h1 class="text-center">Welcome to Employee Management System</h1>
+        <div th:switch="${#authorization.expr('isAuthenticated()')}" class="text-center mt-4">
+            <a th:case="false" href="/login" class="btn btn-primary">Login</a>
+            <a th:case="true" href="/employeelist" class="btn btn-primary">Employee List</a>
+<!--            <a href="/register" class="btn btn-success">Register</a>-->
+<!--            <a href="user/employees.html" class="btn btn-info">Employee List</a>-->
+        </div>
+    </div>
+</div>
+
+

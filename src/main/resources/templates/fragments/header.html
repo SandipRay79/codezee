@@ -1,0 +1,19 @@
+<nav class="navbar navbar-expand-lg navbar-dark shadow-sm" xmlns:th="http://www.w3.org/1999/xhtml" th:fragment="header">
+    <div class="container-fluid">
+        <a class="navbar-brand fw-bold navbar" href="/">EMS</a>
+        <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navBar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div id="navBar" class="collapse navbar-collapse navbar">
+            <ul class="navbar-nav ms-auto gap-2">
+                <li><a class="nav-link" th:href="@{/}">Home</a></li>
+                <li th:if="${#authorization.expr('!isAuthenticated()')}"><a class="nav-link" th:href="@{/login}">Login</a></li>
+<!--                <li><a class="btn btn-outline-danger btn-sm" th:href="@{/logout}">Logout</a></li>-->
+                <li th:if="${#authorization.expr('isAuthenticated()')}">
+                    <a class="btn btn-outline-danger btn-sm" th:href="@{/logout}">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
