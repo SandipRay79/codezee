@@ -9,15 +9,4 @@ import org.springframework.data.repository.query.Param;
 
 public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
     Employee findByEmail(String email);
-
-    @Query("""
-            SELECT e FROM Employee e
-            WHERE (:name IS NULL
-                   OR LOWER(e.firstName) LIKE LOWER(CONCAT('%', :name, '%'))
-                   OR LOWER(e.lastName) LIKE LOWER(CONCAT('%', :name, '%')))
-              AND (:departmentId IS NULL OR e.departmentId = :departmentId)
-            """)
-    Page<Employee> search(@Param("name") String name,
-                          @Param("departmentId") Integer departmentId,
-                          Pageable pageable);
 }
