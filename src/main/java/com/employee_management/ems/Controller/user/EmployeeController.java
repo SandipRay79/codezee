@@ -69,6 +69,14 @@ public class EmployeeController {
         return "redirect:/employeelist";
     }
 
+    @GetMapping("/employeelist")
+    public String getEmployeeList(Model model) {
+        model.addAttribute("employees", empService.getAllEmployees());
+        model.addAttribute("pageTitle", "EmployeeList");
+        model.addAttribute("content", "user/employeeList");
+        return "layout";
+    }
+
     @GetMapping("/employee/edit/{id}")
     public String getEmployee(@PathVariable Integer id,@ModelAttribute Employee employee, Model model) {
        model.addAttribute("employee",empService.fetchEmployeeById(id));
