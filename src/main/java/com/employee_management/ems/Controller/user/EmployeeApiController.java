@@ -32,9 +32,12 @@ public class EmployeeApiController {
 
     @GetMapping("/lookup")
     public List<Map<String, Object>> lookupByEmail(@RequestParam String email) {
-        String sql = "SELECT * FROM employee WHERE email = '" + email + "'";
-        log.info("Running lookup: {}", sql);
-        return jdbcTemplate.queryForList(sql);
+//        String sql = "SELECT * FROM employee WHERE email = '" + email + "'";
+//        log.info("Running lookup: {}", sql);
+//        return jdbcTemplate.queryForList(sql);
+        String sql = "SELECT * FROM employee WHERE email = ?";
+        log.info("Running lookup for email {}", email);
+        return jdbcTemplate.queryForList(sql, email);
     }
 
     @GetMapping("/{id}")
