@@ -18,7 +18,7 @@
         <input type="text" name="name" th:value="${name}" placeholder="Search by name">
         <select name="departmentId">
             <option value="">All departments</option>
-            <option th:each="d : ${departments}"
+            <option th:each="d : ${department}"
                     th:value="${d.id}" th:text="${d.name}"
                     th:selected="${d.id == departmentId}"></option>
         </select>
