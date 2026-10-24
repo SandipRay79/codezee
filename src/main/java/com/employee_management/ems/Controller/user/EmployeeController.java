@@ -8,13 +8,11 @@ import com.employee_management.ems.Service.user.DepartmentService;
 import com.employee_management.ems.Service.user.EmployeeService;
 import com.employee_management.ems.Service.user.RoleService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.management.Attribute;
@@ -70,8 +68,21 @@ public class EmployeeController {
     }
 
     @GetMapping("/employeelist")
-    public String getEmployeeList(Model model) {
-        model.addAttribute("employees", empService.getAllEmployees());
+    public String getEmployeeList(@RequestParam(required = false) String name,
+                                @RequestParam(required = false) Integer departmentId,
+                                @RequestParam(defaultValue = "0") int page,
+                                @RequestParam(defaultValue = "10") int size,
+                                Model model) {
+        Page<Employee> result = empService.searchEmployees(name, departmentId, page, size);
+
+        model.addAttribute("employees", result.getContent());
+        model.addAttribute("currentPage", result.getNumber());
+        model.addAttribute("totalPages", result.getTotalPages());
+        model.addAttribute("totalItems", result.getTotalElements());
+        model.addAttribute("name", name);
+        model.addAttribute("departmentId", departmentId);
+        model.addAttribute("size", result.getSize());
+        model.addAttribute("departments", departmentService.getAllDepartments());
         model.addAttribute("pageTitle", "EmployeeList");
         model.addAttribute("content", "user/employeeList");
         return "layout";
