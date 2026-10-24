@@ -5,6 +5,12 @@ import com.employee_management.ems.Entity.Employee;
 import com.employee_management.ems.Repository.DepartmentRepository;
 import com.employee_management.ems.Repository.EmployeeRepository;
 import com.employee_management.ems.Repository.RoleRepository;
+import jakarta.persistence.criteria.Predicate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,6 +18,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -90,11 +97,26 @@ public class EmployeeService implements UserDetailsService {
     }
 
     public Page<Employee> searchEmployees(String name, Integer departmentId, int page, int size) {
-        String keyword = (name == null || name.isBlank()) ? null : name.trim();
+        String keyword = (name == null || name.isBlank()) ? null : name.trim().toLowerCase();
         int safePage = Math.max(page, 0);
         int safeSize = Math.min(Math.max(size, 1), 50); // cap page size
         Pageable pageable = PageRequest.of(safePage, safeSize,
                 Sort.by("lastName").ascending().and(Sort.by("firstName").ascending()));
-        return employeeRepository.search(keyword, departmentId, pageable);
+
+        Specification<Employee> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            if (keyword != null) {
+                String pattern = "%" + keyword + "%";
+                predicates.add(cb.or(
+                        cb.like(cb.lower(root.get("firstName")), pattern),
+                        cb.like(cb.lower(root.get("lastName")), pattern)));
+            }
+            if (departmentId != null) {
+                predicates.add(cb.equal(root.get("departmentId"), departmentId));
+            }
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        return employeeRepository.findAll(spec, pageable);
     }
 }
