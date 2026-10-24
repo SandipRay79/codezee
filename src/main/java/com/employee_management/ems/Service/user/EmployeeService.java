@@ -88,4 +88,13 @@ public class EmployeeService implements UserDetailsService {
         employeeRepository.deleteById(Id);
         return true;
     }
+
+    public Page<Employee> searchEmployees(String name, Integer departmentId, int page, int size) {
+        String keyword = (name == null || name.isBlank()) ? null : name.trim();
+        int safePage = Math.max(page, 0);
+        int safeSize = Math.min(Math.max(size, 1), 50); // cap page size
+        Pageable pageable = PageRequest.of(safePage, safeSize,
+                Sort.by("lastName").ascending().and(Sort.by("firstName").ascending()));
+        return employeeRepository.search(keyword, departmentId, pageable);
+    }
 }
